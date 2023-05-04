@@ -1,0 +1,46 @@
+import os
+
+import chat
+import chatNode
+import values
+
+def redirect(myChat):
+    os.system('cls')
+    myChat.printHistoryWithIndex()
+    print("\033[92m" + "Please enter the index of the message you want to redirect: ")
+    print("\033[0m")
+    while True:
+        index = input()
+        try:
+            myChat.printNodePaths(index)
+            break
+        except:
+            print("\033[91m" + "Invalid index!" + "\033[0m")        
+    redirectNode = chat.getAheadNode(myChat.chatHead, int(index))
+    print("\033[92m" + "Please enter the path you want to redirect to: ")
+    print("\033[0m")
+    while True:
+        path = input()
+        if path.isdigit() and int(path) < len(redirectNode.next) and int(path) >= 0:
+            break    
+
+    # if the user wants to add a new message
+    if path == "\t":
+        newMessage = input("New message: ")
+        # append the new message and change the path
+        if redirectNode.content["role"] == "assistant":
+            redirectNode.next.append(chatNode.ChatNode({"role": "user", "content": newMessage}))
+        elif redirectNode.content["role"] == "user":
+            redirectNode.next.append(chatNode.ChatNode({"role": "assistant", "content": newMessage}))
+        redirectNode.path = len(redirectNode.next) - 1
+        # refresh the chatEnd and the history
+        myChat.refreshEnd()
+        myChat.refreshHistory()
+        return values.REDIRECT_NEW
+    # if the user wants to redirect to an existing message
+    else:
+        chat.getAheadNode(myChat.chatHead, int(index)).path = int(path)
+        # refresh the chatEnd and the history
+        myChat.refreshEnd()
+        myChat.refreshHistory()
+        return values.REDIRECT
