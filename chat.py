@@ -15,6 +15,8 @@ class Chat:
     def refreshEnd(self):
         nowNode = self.chatHead
         while True:
+            if nowNode.path >= len(nowNode.next):
+                break
             nowNode = nowNode.next[nowNode.path]
             if nowNode.next == []:
                 break
@@ -27,8 +29,15 @@ class Chat:
     
     def addGPTMessage(self, GPTMessage):
         message = {"role": "assistant", "content": GPTMessage}
-        self.chatEnd.addNext(ChatNode(message))
-        self.chatEnd = self.chatEnd.next[0]
+        if self.chatEnd.content["role"] != "assistant":
+            self.chatEnd.addNext(ChatNode(message))
+            self.chatEnd = self.chatEnd.next[0]
+        else:
+            previousNode = getAheadNode(self.chatHead, self.chatEnd)
+            previousNode.addNext(ChatNode(message))
+            previousNode.path = len(previousNode.next) - 1
+            self.chatEnd = previousNode.next[previousNode.path]
+
     
     def printHistory(self):
         nowNode = self.chatHead
@@ -59,7 +68,7 @@ class Chat:
             nowNode = nowNode.next[nowNode.path]
 
     def printNodePaths(self, index):
-        nowNode = getAheadNode(self.chatHead, int(index))
+        nowNode = getAheadNodeWithTimes(self.chatHead, int(index))
         for i in range(len(nowNode.next)):
             print(str(i) + ":", end=" ")
             print(nowNode.next[i].content)
@@ -84,6 +93,8 @@ class Chat:
         self.history = []
         while True:
             self.history.append(nowNode.content)
+            if nowNode.path >= len(nowNode.next):
+                break
             nowNode = nowNode.next[nowNode.path]
             if nowNode.next == []:
                 self.history.append(nowNode.content)
@@ -107,11 +118,20 @@ def dictToTree(myList):
     result.next = [dictToTree(child) for child in myList["children"]]
     return result
 
-def getAheadNode(head, index):
+def getAheadNodeWithTimes(head, index):
     nowNode = head
     for i in range(index):
         nowNode = nowNode.next[nowNode.path]
     return nowNode
+
+def getAheadNode(head, node):
+    nowNode = head
+    while True:
+        if nowNode.next == []:
+            return None
+        if nowNode.next[nowNode.path] == node:
+            return nowNode
+        nowNode = nowNode.next[nowNode.path]
 
 
 

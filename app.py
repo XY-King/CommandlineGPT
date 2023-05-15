@@ -23,9 +23,8 @@ def main():
                 chatManager.GPTResponse(myChat)
             case values.REDIRECT:
                 pass
-
-        
-
+            case values.GENERATE_AGAIN:
+                chatManager.GPTResponse(myChat)
 
 if __name__ == '__main__':
     main()

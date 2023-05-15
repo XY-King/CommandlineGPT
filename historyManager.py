@@ -4,6 +4,7 @@ import os
 
 import prompts
 import chat
+import openai_parameters
 
 openai.api_key = json.loads(open("./config.json", "r").read())["api_key"]
 
@@ -46,8 +47,8 @@ def summarizeHistory(myChat):
         summary = openai.ChatCompletion.create(
                 model = "gpt-3.5-turbo",
                 messages = myHistory,
-                max_tokens = 1024,
-                temperature = 0.6
+                max_tokens = openai_parameters.max_tokens,
+                temperature = openai_parameters.temperature,
             )
     except:
         print("\033[91m" + "OpenAI API Error!\nUse previous summary." + "\033[0m")

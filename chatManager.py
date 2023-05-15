@@ -5,6 +5,7 @@ import sys
 import historyManager
 import chatFunction
 import values
+import openai_parameters
 
 openai.api_key = json.loads(open("./config.json", "r").read())["api_key"]
     
@@ -17,6 +18,8 @@ def userInput(myChat):
             return values.BYE
         case "\t":
             return chatFunction.redirect(myChat)
+        case "\t\t":
+            return chatFunction.generateAgain(myChat)
         case "help":
             printHelpMessage()
         case _:
@@ -29,8 +32,8 @@ def GPTResponse(myChat):
         response = openai.ChatCompletion.create(
                 model = "gpt-3.5-turbo",
                 messages = myChat.history,
-                max_tokens = 2048,
-                temperature = 1
+                max_tokens = openai_parameters.max_tokens,
+                temperature = openai_parameters.temperature,
             ) 
     except:
         print("\033[91m" + "OpenAI API Error!" + "\033[0m")
