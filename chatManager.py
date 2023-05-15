@@ -48,4 +48,5 @@ def printHelpMessage():
     print("\033[95m" + "Help:" + "\033[0m")
     print("\033[95m" + "1. Enter \"exit\" or \"quit\" or \"bye\" to exit the program." + "\033[0m")
     print("\033[95m" + "2. Enter \"\t\" to redirect one response or user input in the conversation." + "\033[0m")
+    print("\033[95m" + "3. Enter \"\t\t\" to regenerate response for the last user input." + "\033[0m")
     input()
