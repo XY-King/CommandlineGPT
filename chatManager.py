@@ -1,6 +1,7 @@
 import openai
 
 import json
+import sys
 import historyManager
 import chatFunction
 import values
@@ -24,12 +25,18 @@ def userInput(myChat):
             return values.INPUT
         
 def GPTResponse(myChat):
-    response = openai.ChatCompletion.create(
-            model = "gpt-3.5-turbo",
-            messages = myChat.history,
-            max_tokens = 1024,
-            temperature = 0.6
-        ) 
+    try:
+        response = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = myChat.history,
+                max_tokens = 2048,
+                temperature = 1
+            ) 
+    except:
+        print("\033[91m" + "OpenAI API Error!" + "\033[0m")
+        historyManager.dumpHistory(myChat)
+        print("ChatGPT: Goodbye!")
+        sys.exit()
     myChat.addGPTMessage(response.choices[0].message.content)
     myChat.history.append({"role": "assistant", "content": response.choices[0].message.content})
 

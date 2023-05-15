@@ -1,10 +1,11 @@
-import chatNode
+from chatNode import ChatNode
 import time
 import json
+import prompts
 
 class Chat:
     def __init__(self):
-        chatHead = chatNode.ChatNode({"role": "system", "content": "You are a helpful assistant."})
+        chatHead = ChatNode(prompts.systemMessage)
         self.chatHead = chatHead
         self.chatEnd = chatHead
 
@@ -21,12 +22,12 @@ class Chat:
 
     def addUserMessage(self, user_input):
         input = {"role": "user", "content": user_input}
-        self.chatEnd.addNext(chatNode.ChatNode(input))
+        self.chatEnd.addNext(ChatNode(input))
         self.chatEnd = self.chatEnd.next[0]
     
     def addGPTMessage(self, GPTMessage):
         message = {"role": "assistant", "content": GPTMessage}
-        self.chatEnd.addNext(chatNode.ChatNode(message))
+        self.chatEnd.addNext(ChatNode(message))
         self.chatEnd = self.chatEnd.next[0]
     
     def printHistory(self):
@@ -101,7 +102,7 @@ def treeToDict(node):
 def dictToTree(myList):
     if myList == {}:
         return None
-    result = chatNode.ChatNode(myList["value"])
+    result = ChatNode(myList["value"])
     result.path = myList["path"]
     result.next = [dictToTree(child) for child in myList["children"]]
     return result

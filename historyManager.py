@@ -21,7 +21,7 @@ def chooseHistory(myChat):
     while True:
         print("Please enter the index of the history you want to load: ")
         historyIndex = int(input("Input 0 if you want to start a new chat:"))
-        if historyIndex >= len(historyList) or historyIndex < 0:
+        if historyIndex > len(historyList) or historyIndex < 0:
             print("\033[91m" + "Invalid index!" + "\033[0m")
         else:
             break
@@ -42,12 +42,16 @@ def loadDialogue(myChat, title):
 def summarizeHistory(myChat):
     myHistory = myChat.history.copy()
     myHistory.append({"role": "user", "content": prompts.summary_prompt})
-    summary = openai.ChatCompletion.create(
-            model = "gpt-3.5-turbo",
-            messages = myHistory,
-            max_tokens = 1024,
-            temperature = 0.6
-        )
+    try:
+        summary = openai.ChatCompletion.create(
+                model = "gpt-3.5-turbo",
+                messages = myHistory,
+                max_tokens = 1024,
+                temperature = 0.6
+            )
+    except:
+        print("\033[91m" + "OpenAI API Error!\nUse previous summary." + "\033[0m")
+        return ""
     return summary.choices[0].message.content
 
 def dumpHistory(myChat):
@@ -57,16 +61,23 @@ def dumpHistory(myChat):
         with open("./history.json", "r") as f:
             nowHistory = json.loads(f.read())
     # delete the original json file
+    summaryBackup = ""
     if myChat.title != "":
         os.system("rm " + myChat.title)
         for i in range(len(nowHistory)):
             if nowHistory[i]["file"] == myChat.title:
+                summaryBackup = nowHistory[i]["summary"]
                 nowHistory.pop(i)
                 break
     # dumps the history to a json file
     myChat.dumpHistory()
     # summarize the history
     summary = summarizeHistory(myChat)
+    if summary == "":
+        if summaryBackup != "":
+            summary = summaryBackup
+        else:
+            summary = "No summary"
     # update the history.json
     nowHistory.append({"file" : myChat.title, "summary" : summary})
     with open("./history.json", "w") as f:

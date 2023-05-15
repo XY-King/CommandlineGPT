@@ -1,7 +1,7 @@
 import os
 
 import chat
-import chatNode
+from chatNode import ChatNode
 import values
 
 def redirect(myChat):
@@ -21,7 +21,7 @@ def redirect(myChat):
     print("\033[0m")
     while True:
         path = input()
-        if path.isdigit() and int(path) < len(redirectNode.next) and int(path) >= 0:
+        if path == '\t' or (path.isdigit() and int(path) < len(redirectNode.next) and int(path) >= 0):
             break    
 
     # if the user wants to add a new message
@@ -29,9 +29,9 @@ def redirect(myChat):
         newMessage = input("New message: ")
         # append the new message and change the path
         if redirectNode.content["role"] == "assistant":
-            redirectNode.next.append(chatNode.ChatNode({"role": "user", "content": newMessage}))
+            redirectNode.next.append(ChatNode({"role": "user", "content": newMessage}))
         elif redirectNode.content["role"] == "user":
-            redirectNode.next.append(chatNode.ChatNode({"role": "assistant", "content": newMessage}))
+            redirectNode.next.append(ChatNode({"role": "assistant", "content": newMessage}))
         redirectNode.path = len(redirectNode.next) - 1
         # refresh the chatEnd and the history
         myChat.refreshEnd()
@@ -44,3 +44,14 @@ def redirect(myChat):
         myChat.refreshEnd()
         myChat.refreshHistory()
         return values.REDIRECT
+    
+def generateAgain(myChat):
+    if myChat.chatEnd.content["role"] != "assistant":
+        print("\033[91m" + "You can only generate again for the assistant's message!" + "\033[0m")
+        return values.GENERATE_AGAIN_ERROR
+    return values.GENERATE_AGAIN
+
+
+
+
+
